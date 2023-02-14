@@ -1,0 +1,37 @@
+# Problem Statement
+Calculate the Login Time, Log-Out time and number of logins before logout
+
+Table Structure and data-
+
+create or replace table event_status
+(
+event_time varchar(10),
+status varchar(10)
+);
+insert into event_status 
+values
+('10:01','on'),('10:02','on'),('10:03','on'),('10:04','off'),('10:07','on'),('10:08','on'),('10:09','off')
+,('10:11','on'),('10:12','off');
+
+select * from event_status
+
+*-------------*------------------*-------------------*--------SOLUTION----------------*-----------------------------*---------
+
+with cte as
+(
+  select 
+    a.event_time, min(b.event_time) as min_close_time 
+    from event_status a
+    left join event_status b 
+    on 
+        a.event_time != b. event_time 
+        and a.status!=b.status
+    where b. event_time> a. event_time and a. status = 'on'
+    group by 1
+    order by 1
+)
+select 
+    min(event_time)as start_time,  min_close_time as close_time, count(min_close_time) as on_count
+    from cte
+    group by 2
+    order by 1
